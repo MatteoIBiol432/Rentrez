@@ -5,6 +5,8 @@ date: "2025-02-25"
 output: html_document
 ---
 
+https://github.com/MatteoIBiol432/Rentrez
+
 This report analyzes a given DNA sequence using BLAST to identify the closest matching organism in GenBank.
 
 ```{r}
