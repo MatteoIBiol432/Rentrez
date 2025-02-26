@@ -1,0 +1,55 @@
+---
+title: "GenBank BLAST Analysis Report"
+author: "Matteo"
+date: "2025-02-25"
+output: html_document
+---
+
+This report analyzes a given DNA sequence using BLAST to identify the closest matching organism in GenBank.
+
+```{r}
+library(rentrez)
+library(BiocManager)
+BiocManager::install(c("annotate", "Biostrings", "sangerseqR"), ask = FALSE)
+library(annotate)
+library(Biostrings)
+library(sangerseqR)
+```
+
+```{r}
+sequence <- "GCCTGATGGAGGGGGATAACTACTGGAAACGGTAGCTAATACCGCATGACTCTGCAAGAGCAAAGTGGGGGACCTTAGGGCCTCACGCCATCGGATGAACCCAGATGGGATTAGCTAGTAGGTGGGGTAATGGCTCACCTAGGCGACGATCCCTAGCTGGTCTGAGAGGATGACCAGCCACACTGGAACTGAGACACGGTCCAGACTCCTACGGGAGGCAGCAGTGGGGAATATTGCACAATGGGCGCAA"
+
+sequence <- gsub("\\n", "", sequence)
+dna_seq <- DNAString(sequence)
+```
+
+```{r}
+blast_results <- blastSequences(dna_seq, as='data.frame', timeout=240)
+
+print(blast_results)
+```
+
+```{r}
+best_hit <- blast_results[1, ]
+
+best_hit_id <- best_hit$Hit_id
+best_hit_accession <- best_hit$Hit_accession
+best_hit_species <- best_hit$Hit_def
+
+best_hit_id
+best_hit_accession
+best_hit_species
+```
+
+```{r}
+ref_seq <- entrez_fetch(db = "nucleotide", id = best_hit_accession, rettype = "fasta")
+ref_seq <- DNAString(gsub(".*\\n", "", ref_seq))
+```
+
+```{r}
+alignment <- pairwiseAlignment(dna_seq, ref_seq)
+```
+
+In conclusion, the BLAST results suggest that the patient’s DNA sequence is closely related to Yersinia pestis strain 46514, which is a known pathogenic organism. This finding warrants immediate clinical attention to determine if the patient is infected with Yersinia pestis and to implement appropriate diagnostic and treatment protocols.
+
+I would recommend immediate testing and monitoring
